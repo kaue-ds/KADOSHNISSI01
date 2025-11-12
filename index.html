@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizador de Compra de Camisetas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Optimizador de Compra de Camisetas</h1>
+        <div class="card">
+            <h2>Ingrese las cantidades por talla</h2>
+            <form id="tallas-form">
+                <div class="tallas-grid">
+                    <div class="talla-item">
+                        <label for="xs">XS</label>
+                        <input type="number" id="xs" min="0" value="0">
+                    </div>
+                    <div class="talla-item">
+                        <label for="s">S</label>
+                        <input type="number" id="s" min="0" value="0">
+                    </div>
+                    <div class="talla-item">
+                        <label for="m">M</label>
+                        <input type="number" id="m" min="0" value="0">
+                    </div>
+                    <div class="talla-item">
+                        <label for="l">L</label>
+                        <input type="number" id="l" min="0" value="0">
+                    </div>
+                    <div class="talla-item">
+                        <label for="xl">XL</label>
+                        <input type="number" id="xl" min="0" value="0">
+                    </div>
+                    <div class="talla-item">
+                        <label for="xxl">XXL</label>
+                        <input type="number" id="xxl" min="0" value="0">
+                    </div>
+                </div>
+                <button type="submit">Calcular Costo Óptimo</button>
+            </form>
+        </div>
+        <div id="results" class="results-container card" style="display: none;">
+            <!-- Los resultados se insertarán aquí -->
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
