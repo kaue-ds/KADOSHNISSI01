@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KADOSH NISSI - Sistema de Presupuestos</title>
+    <style>
+        /* === GOOGLE FONTS (INTER) === */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        /* === CSS VARIABLES & THEME === */
+        :root {
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --color-primary: #111827;
+            --color-primary-light: #374151;
+            --color-secondary: #10b981;
+            --color-secondary-dark: #059669;
+            --color-accent: #3b82f6;
+            --color-danger: #ef4444;
+            --color-danger-dark: #dc2626;
+            --color-warning: #f59e0b;
+            --color-text: #1f2937;
+            --color-text-muted: #6b7280;
+            --color-white: #ffffff;
+            --color-bg: #f9fafb;
+            --color-bg-alt: #ffffff;
+            --color-border: #e5e7eb;
+            --color-border-focus: var(--color-primary);
+            --border-radius-sm: 6px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* === TEMA OSCURO CORREGIDO === */
+        [data-theme="dark"] {
+            --color-primary: #ffffff;
+            --color-primary-light: #e5e7eb;
+            --color-secondary: #10b981;
+            --color-secondary-dark: #059669;
+            --color-accent: #3b82f6;
+            --color-danger: #ef4444;
+            --color-danger-dark: #dc2626;
+            --color-warning: #f59e0b;
+            --color-text: #ffffff;
+            --color-text-muted: #9ca3af;
+            --color-white: #000000;
+            --color-bg: #000000;
+            --color-bg-alt: #111111;
+            --color-border: #333333;
+            --color-border-focus: var(--color-primary);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.7), 0 4px 6px -4px rgb(0 0 0 / 0.7);
+        }
+
+        /* === ESTILOS GENERALES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* === THEME SWITCHER === */
+        .theme-switcher {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            padding: 3px;
+            border: 1px solid var(--color-border);
+            border-radius: 9999px;
+            background: var(--color-bg-alt);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .theme-switcher:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            max-width: 36px;
+            max-height: 36px;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-btn:hover {
+            color: var(--color-text);
+            background: transparent;
+        }
+
+        .theme-btn[data-state="active"] {
+            background: rgba(107, 114, 128, 0.3);
+            color: var(--color-text);
+        }
+
+        .theme-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Animación del icono de luz */
+        .theme-btn[aria-label="light"] svg [data-g="high"] {
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-btn[aria-label="light"]:hover svg [data-g="high"] {
+            transform: scale(1.3);
+        }
+
+        .theme-btn[aria-label="light"] svg [data-g="low"] {
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-btn[aria-label="light"]:hover svg [data-g="low"] {
+            opacity: 1;
+        }
+
+        /* === STICKY MENU (PEGABLE) === */
+        .sticky-menu {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 1100;
+            background: rgba(17, 24, 39, 0.9);
+            padding: 16px;
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: none;
+        }
+
+        [data-theme="dark"] .sticky-menu {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .sticky-menu:hover {
+            background: rgba(17, 24, 39, 0.95);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .sticky-menu:hover {
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        #checkbox {
+            display: none;
+        }
+
+        .toggle {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition-duration: .4s;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .bars {
+            width: 70%;
+            height: 3px;
+            background: linear-gradient(90deg, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 4px;
+            transition-duration: .4s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #checkbox:checked + .toggle #bar2 {
+            transform: translateY(14px) rotate(45deg);
+            margin-left: 0;
+            transform-origin: center;
+            transition-duration: .5s;
+            z-index: 2;
+        }
+
+        #checkbox:checked + .toggle #bar1 {
+            transform: translateY(14px) rotate(-45deg);
+            transition-duration: .5s;
+            transform-origin: center;
+            z-index: 1;
+        }
+
+        #checkbox:checked + .toggle #bar3 {
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+            transition-duration: .3s;
+        }
+
+        #checkbox:checked + .toggle {
+            transform: rotate(180deg);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Mobile Menu Content */
+        .mobile-menu {
+            display: none;
+            padding: 20px 0 0 0;
+            width: 250px;
+        }
+
+        #checkbox:checked ~ .mobile-menu {
+            display: block;
+        }
+
+        .input {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: transparent;
+            justify-content: center;
+            border-radius: 10px;
+            transition: 1s;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .value {
+            font-size: 15px;
+            background-color: transparent;
+            border: none;
+            padding: 10px;
+            color: var(--color-white);
+            display: flex;
+            position: relative;
+            gap: 8px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 1s;
+            box-sizing: border-box;
+            align-items: center;
+            text-align: left;
+            width: 100%;
+        }
+
+        .value:not(:active):hover,
+        .value:focus {
+            display: flex;
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-white);
+        }
+
+        .value:focus,
+        .value:active {
+            background-color: rgba(255, 255, 255, 0.15);
+            outline: none;
+            margin-left: 17px;
+        }
+
+        .value::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: -15px;
+            width: 5px;
+            height: 80%;
+            background-color: var(--color-accent);
+            border-radius: 5px;
+            opacity: 0;
+            transition: 1s;
+        }
+
+        .value:focus::before,
+        .value:active::before {
+            opacity: 1;
+        }
+
+        .value svg {
+            width: 20px;
+            min-width: 20px;
+            fill: currentColor;
+        }
+
+        .input:hover > :not(.value:hover) {
+            transition: 300ms;
+            filter: blur(1.5px);
+            transform: scale(0.95, 0.95);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+        }
+        .screen.active {
+            display: block;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* === PANTALLA DE LOGIN === */
+        .login-screen { background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; }
+        .login-content { max-width: 380px; width: 100%; padding: 40px 20px; box-sizing: border-box; }
+        .login-form { text-align: left; background: var(--color-bg-alt); padding: 24px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--color-border); }
+        .login-form__title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--color-primary); }
+        .login-form__description { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 24px; }
+        .login-form__body { margin-bottom: 24px; }
+        .zds-form-control { margin-bottom: 16px; }
+        .zds-input-base { position: relative; width: 100%; }
+        .zds-input-base__label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--color-text); }
+        .zds-input-base__input { width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); font-size: 1rem; transition: var(--transition); background: var(--color-bg-alt); color: var(--color-text); box-sizing: border-box; }
+        .zds-input-base__input:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
+        [data-theme="dark"] .zds-input-base__input:focus { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1); }
+        .zds-input-base__border { position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--color-border); transition: var(--transition); }
+        .zds-input-base__input:focus ~ .zds-input-base__border { background: var(--color-primary); }
+        .zds-input-base__slot { margin-top: 4px; font-size: 0.8rem; color: var(--color-danger); }
+        .zds-button { border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: var(--border-radius-md); cursor: pointer; transition: var(--transition); text-transform: uppercase; letter-spacing: 1px; box-shadow: var(--shadow-sm); }
+        .zds-button--primary { background: var(--color-primary); color: var(--color-white); }
+        .zds-button--primary:hover { background: var(--color-primary-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .zds-button--small { padding: 8px 16px; font-size: 0.875rem; }
+        .zds-button--secondary { background: var(--color-text-muted); color: var(--color-white); }
+        .zds-button--secondary:hover { background: var(--color-primary-light); }
+        .login-options { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--color-border); }
+        .login-options p { color: var(--color-text-muted); margin-bottom: 15px; font-size: 0.9rem; }
+        .register-screen { background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; text-align: center; min-height: 100vh; }
+        .register-content { max-width: 420px; width: 100%; padding: 40px 20px; box-sizing: border-box; }
+        .register-form { text-align: left; background: var(--color-bg-alt); padding: 24px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--color-border); }
+        .register-form__title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--color-primary); }
+        .register-form__description { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 24px; }
+        .register-form__body { margin-bottom: 24px; }
+        .password-strength { margin-top: 8px; font-size: 0.8rem; }
+        .strength-bar { height: 4px; background: var(--color-border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .strength-fill { height: 100%; width: 0%; transition: var(--transition); }
+        .strength-weak { background: var(--color-danger); width: 33%; }
+        .strength-medium { background: var(--color-warning); width: 66%; }
+        .strength-strong { background: var(--color-secondary); width: 100%; }
+        .strength-text { font-size: 0.75rem; margin-top: 2px; }
+
+        /* === DASHBOARD PRINCIPAL === */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background: var(--color-bg);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: var(--color-bg-alt);
+            border-right: 1px solid var(--color-border);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 900;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+            transition: var(--transition);
+            color: var(--color-text-muted);
+            text-align: left;
+            white-space: nowrap;
+        }
+        .sidebar-tab:hover {
+            background: var(--color-bg);
+            color: var(--color-primary);
+        }
+        .sidebar-tab.active {
+            background: var(--color-primary);
+            color: var(--color-white);
+            box-shadow: var(--shadow-sm);
+        }
+        .dashboard-main {
+            flex: 1;
+            padding: 48px 0;
+        }
+        .content-screen { display: none; }
+        .content-screen.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 32px;
+            color: var(--color-primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* === SECCIONES Y CARDS === */
+        .section-container { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--shadow-sm); }
+        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; color: var(--color-primary); }
+        .empty-state { color: var(--color-text-muted); text-align: center; padding: 40px 20px; font-style: italic; background: var(--color-bg); border-radius: var(--border-radius-md); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .stat-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 24px; text-align: center; transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--color-primary-light); }
+        .stat-number { font-size: 3rem; font-weight: 800; margin-bottom: 8px; color: var(--color-primary); letter-spacing: -1px; }
+        .stat-label { font-size: 0.9rem; color: var(--color-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .contenido-tabs { display: flex; gap: 4px; background: var(--color-bg); border-radius: var(--border-radius-md); padding: 4px; margin-bottom: 30px; border: 1px solid var(--color-border); }
+        .contenido-tab { flex: 1; text-align: center; background: none; border: none; padding: 12px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: var(--border-radius-sm); transition: var(--transition); color: var(--color-text-muted); }
+        .contenido-tab.active { background: var(--color-primary); color: var(--color-white); box-shadow: var(--shadow-sm); }
+        .search-filters { display: grid; grid-template-columns: 1fr auto auto; gap: 16px; margin-bottom: 24px; align-items: center; }
+        .search-input, .filter-select { padding: 12px 16px; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); font-size: 1rem; transition: var(--transition); background: var(--color-bg-alt); color: var(--color-text); }
+        .search-input:focus, .filter-select:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
+        [data-theme="dark"] .search-input:focus, [data-theme="dark"] .filter-select:focus { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1); }
+        .clear-filters-btn { background: var(--color-text-muted); color: var(--color-white); border: none; padding: 12px 20px; border-radius: var(--border-radius-md); font-size: 0.9rem; cursor: pointer; transition: var(--transition); font-weight: 600; }
+        .clear-filters-btn:hover { background: var(--color-primary-light); }
+        .contenido-list { display: grid; gap: 16px; }
+        .contenido-item { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 20px; transition: var(--transition); cursor: pointer; }
+        .contenido-item:hover { border-color: var(--color-primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .item-title { font-weight: 700; color: var(--color-primary); font-size: 1.15rem; }
+        .item-date { font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500; }
+        .item-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 0.9rem; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; }
+        .detail-label { color: var(--color-text-muted); }
+        .detail-value { font-weight: 600; color: var(--color-text); }
+        .item-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+        .action-btn-small { background: var(--color-primary); color: var(--color-white); border: none; padding: 8px 16px; border-radius: var(--border-radius-sm); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .action-btn-small:hover { background: var(--color-primary-light); transform: translateY(-1px); }
+        .action-btn-small.danger { background: var(--color-danger); }
+        .action-btn-small.danger:hover { background: var(--color-danger-dark); }
+        .action-btn-small.secondary { background: var(--color-text-muted); }
+        .action-btn-small.secondary:hover { background: var(--color-primary-light); }
+        .detail-modal { display: none; position: fixed; z-index: 1200; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); }
+        [data-theme="dark"] .detail-modal { background-color: rgba(0, 0, 0, 0.7); }
+        .detail-modal-content { background-color: var(--color-bg-alt); margin: 4% auto; padding: 32px; border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: var(--shadow-lg); animation: slideInUp 0.4s ease; }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .detail-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border); }
+        .detail-modal-title { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+        .close-detail-modal { color: var(--color-text-muted); font-size: 28px; font-weight: bold; cursor: pointer; transition: var(--transition); }
+        .close-detail-modal:hover { color: var(--color-primary); transform: rotate(90deg); }
+        .detail-section { margin-bottom: 24px; }
+        .detail-section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; color: var(--color-primary); border-bottom: 1px solid var(--color-border); padding-bottom: 8px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .detail-item { background: var(--color-bg); padding: 12px; border-radius: var(--border-radius-md); display: flex; justify-content: space-between; align-items: center; }
+        .detail-item-label { color: var(--color-text-muted); font-weight: 500; }
+        .detail-item-value { font-weight: 600; color: var(--color-text); }
+        .presupuesto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .input-group { margin-bottom: 20px; }
+        .input-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--color-text); text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-field, .input-select, .input-textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); font-size: 1rem; transition: var(--transition); background: var(--color-bg-alt); color: var(--color-text); }
+        .input-field:focus, .input-select:focus, .input-textarea:focus { outline: none; border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
+        [data-theme="dark"] .input-field:focus, [data-theme="dark"] .input-select:focus, [data-theme="dark"] .input-textarea:focus { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1); }
+        .input-textarea { resize: vertical; min-height: 80px; }
+        .inline-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .calculate-btn, .save-btn { border: none; padding: 16px 32px; font-size: 1rem; font-weight: 600; border-radius: var(--border-radius-md); cursor: pointer; transition: var(--transition); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; margin-right: 10px; box-shadow: var(--shadow-sm); }
+        .calculate-btn { background: var(--color-primary); color: var(--color-white); }
+        .save-btn { background: var(--color-secondary); color: var(--color-white); }
+        .calculate-btn:hover { background: var(--color-primary-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .save-btn:hover { background: var(--color-secondary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .results-container { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 24px; }
+        .result-section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--color-border); }
+        .result-section:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .result-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--color-primary); }
+        .cost-breakdown { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px; padding: 4px 0; }
+        .cost-label { color: var(--color-text-muted); }
+        .cost-value { font-weight: 600; color: var(--color-text); text-align: right; }
+        .total-cost { background: var(--color-primary); color: var(--color-white); padding: 12px 16px; border-radius: var(--border-radius-md); margin-top: 16px; }
+        .total-cost .cost-label, .total-cost .cost-value { color: var(--color-white) !important; }
+        .lamina-option { background: var(--color-bg); border: 2px solid transparent; border-radius: var(--border-radius-lg); padding: 20px; margin-bottom: 16px; transition: var(--transition); }
+        .lamina-option.recommended { border-color: var(--color-secondary); background: #f0fdf4; box-shadow: var(--shadow-sm); }
+        [data-theme="dark"] .lamina-option.recommended { background: rgba(16, 185, 129, 0.1); }
+        .lamina-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .lamina-name { font-weight: 700; color: var(--color-primary); }
+        .lamina-badge { background: var(--color-secondary); color: var(--color-white); padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .lamina-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 0.9rem; }
+        .savings-note { background: #d1fae5; border-left: 4px solid var(--color-secondary); border-radius: var(--border-radius-sm); padding: 12px; margin-top: 16px; font-size: 0.9rem; color: var(--color-secondary-dark); font-weight: 500; }
+        [data-theme="dark"] .savings-note { background: rgba(16, 185, 129, 0.15); color: var(--color-secondary); }
+        .recommendation-box { background: #fffbeb; border: 1px solid var(--color-warning); border-radius: var(--border-radius-lg); padding: 20px; margin-top: 20px; }
+        [data-theme="dark"] .recommendation-box { background: rgba(245, 158, 11, 0.1); }
+        .recommendation-title { font-weight: 700; margin-bottom: 8px; color: #b45309; }
+        [data-theme="dark"] .recommendation-title { color: var(--color-warning); }
+        .modelo-info { background: #eff6ff; border: 1px solid var(--color-accent); border-radius: var(--border-radius-lg); padding: 16px; margin-bottom: 24px; font-size: 0.9rem; }
+        [data-theme="dark"] .modelo-info { background: rgba(59, 130, 246, 0.1); }
+        .modelo-title { font-weight: 700; margin-bottom: 5px; color: #1e40af; }
+        [data-theme="dark"] .modelo-title { color: var(--color-accent); }
+        .cliente-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 30px; }
+        .form-section { margin-bottom: 24px; }
+        .form-section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--color-primary); border-bottom: 2px solid var(--color-border); padding-bottom: 8px; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+        .radio-option { display: flex; align-items: center; gap: 8px; }
+        .tallas-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .talla-item { display: flex; flex-direction: column; gap: 5px; }
+        .talla-label { font-size: 0.8rem; color: var(--color-text-muted); }
+        .add-cliente-btn { background: var(--color-primary); color: var(--color-white); border: none; padding: 16px 32px; font-size: 1rem; font-weight: 600; border-radius: var(--border-radius-md); cursor: pointer; transition: var(--transition); text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; box-shadow: var(--shadow-sm); }
+        .add-cliente-btn:hover { background: var(--color-primary-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .clientes-list { margin-top: 40px; }
+        .cliente-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 20px; margin-bottom: 16px; transition: var(--transition); }
+        .cliente-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); }
+        .cliente-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .cliente-title { font-weight: 700; color: var(--color-primary); font-size: 1.1rem; }
+        .cliente-status { color: var(--color-white); padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .cliente-details { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.9rem; }
+        .cliente-details span:nth-child(odd) { color: var(--color-text-muted); font-weight: 500; }
+        .cliente-details span:nth-child(even) { font-weight: 600; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .calendar-nav { display: flex; gap: 10px; }
+        .calendar-nav-btn { background: var(--color-primary); color: var(--color-white); border: none; padding: 8px 12px; border-radius: var(--border-radius-md); cursor: pointer; transition: var(--transition); }
+        .calendar-nav-btn:hover { background: var(--color-primary-light); }
+        #mesActual { color: var(--color-primary); font-weight: 700; font-size: 1.5rem; }
+        .calendar-controls { display: flex; gap: 10px; }
+        .calendar-controls select { padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--border-radius-md); font-size: 0.9rem; background: var(--color-bg-alt); color: var(--color-text); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--color-border); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); overflow: hidden; }
+        .calendar-day-header { background: var(--color-bg); color: var(--color-text-muted); padding: 12px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+        .calendar-day { background: var(--color-bg-alt); padding: 8px; min-height: 120px; position: relative; transition: var(--transition); }
+        .calendar-day.other-month { background: var(--color-bg); }
+        .calendar-day.today { background: #eff6ff; }
+        [data-theme="dark"] .calendar-day.today { background: rgba(59, 130, 246, 0.2); }
+        .calendar-day.today .day-number { background-color: var(--color-accent); color: white; border-radius: 50%; }
+        .day-number { font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .event-indicator { color: white; padding: 3px 6px; border-radius: var(--border-radius-sm); font-size: 0.75rem; font-weight: 500; margin-bottom: 4px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: var(--transition); }
+        .event-indicator:hover { opacity: 0.8; transform: scale(1.02); }
+        .event-pc { background: var(--color-danger); }
+        .event-ep { background: var(--color-warning); }
+        .event-ea { background: #d97706; }
+        .event-cf { background: #16a34a; }
+        .event-pr { background: var(--color-accent); }
+        .event-en { background: var(--color-secondary-dark); }
+        .event-ce { background: var(--color-primary); }
+        .database-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .action-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: 24px; text-align: center; transition: var(--transition); }
+        .action-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .action-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); }
+        .action-card p { color: var(--color-text-muted); margin-bottom: 24px; min-height: 40px; }
+        .action-btn { background: var(--color-primary); color: var(--color-white); border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: var(--border-radius-md); cursor: pointer; transition: var(--transition); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .action-btn.export { background: var(--color-secondary); }
+        .action-btn.import { background: var(--color-accent); }
+        .action-btn.delete { background: var(--color-danger); }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .database-info .info-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+        .database-info .info-item { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--color-border); }
+        .database-info .info-item:last-child { border-bottom: none; }
+        .database-info .info-item span { color: var(--color-text-muted); }
+        .modal { display: none; position: fixed; z-index: 1200; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); }
+        [data-theme="dark"] .modal { background-color: rgba(0, 0, 0, 0.7); }
+        .modal-content { background-color: var(--color-bg-alt); margin: 10% auto; padding: 32px; border: 1px solid var(--color-border); width: 90%; max-width: 500px; border-radius: var(--border-radius-lg); position: relative; box-shadow: var(--shadow-lg); animation: slideInUp 0.4s ease; }
+        .close-button { color: var(--color-text-muted); position: absolute; top: 16px; right: 16px; font-size: 28px; font-weight: bold; cursor: pointer; transition: var(--transition); }
+        .close-button:hover { color: var(--color-primary); transform: rotate(90deg); }
+        .event-modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; color: var(--color-primary); }
+        .event-modal-details p { margin-bottom: 12px; font-size: 1rem; line-height: 1.7; }
+        .event-modal-details p strong { color: var(--color-primary); }
+
+        /* === BOTÓN DE CERRAR SESIÓN === */
+        .logout-btn {
+            background: var(--color-danger);
+            color: var(--color-white);
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: auto;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--color-danger-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 992px) {
+            .dashboard-container { flex-direction: column; }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1060;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                background: var(--color-bg-alt);
+                border-right: 1px solid var(--color-border);
+            }
+            .sidebar.sidebar-open {
+                transform: translateX(0);
+            }
+            .sidebar-nav { 
+                display: none;
+            }
+            .sticky-menu {
+                display: block;
+            }
+            .presupuesto-grid { grid-template-columns: 1fr; }
+            .cliente-form-grid { grid-template-columns: 1fr; }
+            .theme-switcher {
+                top: 120px;
+                right: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-filters { grid-template-columns: 1fr; }
+            .inline-inputs { grid-template-columns: 1fr; }
+            .tallas-grid { grid-template-columns: repeat(2, 1fr); }
+            .detail-modal-content { width: 95%; margin: 2% auto; padding: 24px; }
+            .calendar-header { flex-direction: column; gap: 16px; }
+            .calendar-day { min-height: 100px; padding: 6px; }
+            .day-number { font-size: 0.8rem; width: 24px; height: 24px; }
+            .event-indicator { font-size: 0.7rem; padding: 2px 4px; }
+            .database-actions { grid-template-columns: 1fr; }
+            .theme-switcher {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            .section-container { padding: 24px; }
+            .detail-modal-content { padding: 20px; }
+        }
+    </style>
+    <base target="_blank">
+</head>
+<body>
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <code class="sr-only hidden tracking-wide select-none pointer-events-none">⌘+J</code>
+        
+        <button class="theme-btn" aria-label="light" data-state="" role="button" type="button" onclick="setTheme('light')">
+            <svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none">
+                <path d="M14.828 14.828a4 4 0 1 0 -5.656 -5.656a4 4 0 0 0 5.656 5.656z"></path>
+                <g data-g="high">
+                    <path d="M4 12h-3"></path>
+                    <path d="M12 4v-3"></path>
+                    <path d="M20 12h3"></path>
+                    <path d="M12 20v3"></path>
+                </g>
+                <g data-g="low">
+                    <path d="M6.343 17.657l-1.414 1.414"></path>
+                    <path d="M6.343 6.343l-1.414 -1.414"></path>
+                    <path d="M17.657 6.343l1.414 -1.414"></path>
+                    <path d="M17.657 17.657l1.414 1.414"></path>
+                </g>
+            </svg>
+        </button>
+
+        <button class="theme-btn" aria-label="system" data-state="active" role="button" type="button" onclick="setTheme('system')">
+            <svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none">
+                <path d="M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8"></path>
+                <path d="M10 19v-3.96 3.15"></path>
+                <path d="M7 19h5"></path>
+                <rect rx="2" y="12" x="16" height="10" width="6"></rect>
+            </svg>
+        </button>
+
+        <button class="theme-btn" aria-label="dark" data-state="" role="button" type="button" onclick="setTheme('dark')">
+            <svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round" stroke-width="0" stroke="currentColor" fill="none">
+                <path d="m4.8.69c0-.38-.31-.69-.69-.69s-.69.31-.69.69v1.03h-1.03c-.38,0-.69.31-.69.69s.31.69.69.69h1.03v1.03c0,.38.31.69.69.69s.69-.31.69-.69v-1.03h1.03c.38,0,.69-.31.69-.69s-.31-.69-.69-.69h-1.03V.69Zm5.14,5.14c0-.38-.31-.69-.69-.69s-.69.31-.69.69v1.03h-1.03c-.38,0-.69.31-.69.69s.31.69.69.69h1.03v1.03c0,.38.31.69.69.69s.69-.31.69-.69v-1.03h1.03c.38,0,.69-.31.69-.69s-.31-.69-.69-.69h-1.03v-1.03Zm-6.86,5.14c0-.38-.31-.69-.69-.69s-.69.31-.69.69v1.03H.69c-.38,0-.69.31-.69.69s.31.69.69.69h1.03v1.03c0,.38.31.69.69.69s.69-.31.69-.69v-1.03h1.03c.38,0,.69-.31.69-.69s-.31-.69-.69-.69h-1.03v-1.03ZM14.47,1.51l-.51-.07c-.37-.04-.58.38-.37.69.24.35.46.71.67,1.08.86,1.59,1.35,3.42,1.35,5.36,0,5.61-4.08,10.26-9.43,11.16-.41.07-.84.12-1.27.14-.37.02-.57.45-.31.71.12.12.24.24.36.35l.12.11.45.39.32.25.21.15.32.22.3.2c.21.13.42.25.64.37l.45.23.45.2.52.21.42.15c.23.08.46.14.7.21.18.05.36.09.54.13.22.04.43.08.65.12l.54.07.46.04c.22.01.44.02.66.02,6.25,0,11.31-5.07,11.31-11.31,0-.43-.02-.85-.07-1.27l-.06-.48c-.06-.38-.14-.76-.23-1.13-.12-.44-.26-.88-.43-1.3l-.19-.46-.13-.28-.13-.26c-.27-.53-.58-1.03-.93-1.51l-.26-.34-.34-.41-.28-.31-.2-.21-.28-.27-.38-.34-.55-.45-.42-.3-.5-.33-.55-.32-.56-.28-.19-.09-.41-.17-.47-.18-.43-.14-.56-.15-.45-.1-.5-.09Zm3.19,7.4c0-1.76-.35-3.43-.98-4.96,3.31,1.52,5.61,4.86,5.61,8.73,0,5.3-4.3,9.6-9.6,9.6-1.49,0-2.89-.34-4.15-.94,2.5-.79,4.67-2.3,6.27-4.3.23.32.61.53,1.04.53.71,0,1.29-.58,1.29-1.29,0-.61-.43-1.12-1-1.25.11-.2.21-.4.3-.61.33.2.71.32,1.13.32,1.18,0,2.14-.96,2.14-2.14s-.96-2.14-2.14-2.14c.06-.51.09-1.02.09-1.54Z" fill="currentColor" clip-rule="evenodd" fill-rule="evenodd"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-screen">
+            <div class="container">
+                <div class="login-content">
+                    <form class="generic-form login-form" id="loginForm">
+                        <h1 class="login-form__title">Inicia sesión</h1>
+                        <p class="login-form__description">Accede a tu cuenta para continuar</p>
+                        <div class="login-form__body">
+                            <div class="zds-form-control email-input__form-control" role="group">
+                                <div class="zds-input-base email-input zds-input-base--full-width">
+                                    <label class="zds-input-base__label" for="usernameInput">Usuario</label>
+                                    <input class="zds-input-base__input email-input__input-base" id="usernameInput" type="text" name="username" aria-label="Introduce tu usuario" autocomplete="username" placeholder=" " required>
+                                    <div class="zds-input-base__border"></div>
+                                    <div class="zds-input-base__slot" id="usernameError"></div>
+                                </div>
+                            </div>
+                            <div class="zds-form-control password-input__form-control" role="group">
+                                <div class="zds-input-base password-input zds-input-base--full-width">
+                                    <label class="zds-input-base__label" for="passwordInput">Contraseña</label>
+                                    <input class="zds-input-base__input password-input__input-base" id="passwordInput" type="password" name="password" aria-label="Introduce tu contraseña" autocomplete="current-password" placeholder=" " required>
+                                    <div class="zds-input-base__border"></div>
+                                    <div class="zds-input-base__slot" id="passwordError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="zds-button generic-form-submit-button login-form__submit-button zds-button--primary zds-button--small">
+                            Iniciar sesión
+                        </button>
+                        <div class="login-options">
+                            <p>¿No tienes una cuenta?</p>
+                            <button type="button" id="goToRegisterBtn" class="zds-button zds-button--secondary zds-button--small">
+                                Crear cuenta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nueva Pantalla de Registro -->
+    <div id="registerScreen" class="screen">
+        <div class="register-screen">
+            <div class="container">
+                <div class="register-content">
+                    <form class="generic-form register-form" id="registerForm">
+                        <h1 class="register-form__title">Crear cuenta</h1>
+                        <p class="register-form__description">Regístrate para acceder al sistema</p>
+                        <div class="register-form__body">
+                            <div class="zds-form-control username-input__form-control" role="group">
+                                <div class="zds-input-base username-input zds-input-base--full-width">
+                                    <label class="zds-input-base__label" for="registerUsername">Usuario</label>
+                                    <input class="zds-input-base__input username-input__input-base" id="registerUsername" type="text" name="username" aria-label="Elige un nombre de usuario" autocomplete="username" placeholder=" " required>
+                                    <div class="zds-input-base__border"></div>
+                                    <div class="zds-input-base__slot" id="registerUsernameError"></div>
+                                </div>
+                            </div>
+                            <div class="zds-form-control password-input__form-control" role="group">
+                                <div class="zds-input-base password-input zds-input-base--full-width">
+                                    <label class="zds-input-base__label" for="registerPassword">Contraseña</label>
+                                    <input class="zds-input-base__input password-input__input-base" id="registerPassword" type="password" name="password" aria-label="Crea una contraseña" autocomplete="new-password" placeholder=" " required>
+                                    <div class="zds-input-base__border"></div>
+                                    <div class="password-strength">
+                                        <div class="strength-bar">
+                                            <div class="strength-fill" id="passwordStrengthBar"></div>
+                                        </div>
+                                        <div class="strength-text" id="passwordStrengthText">Seguridad de la contraseña</div>
+                                    </div>
+                                    <div class="zds-input-base__slot" id="registerPasswordError"></div>
+                                </div>
+                            </div>
+                            <div class="zds-form-control confirm-password-input__form-control" role="group">
+                                <div class="zds-input-base confirm-password-input zds-input-base--full-width">
+                                    <label class="zds-input-base__label" for="confirmPassword">Confirmar contraseña</label>
+                                    <input class="zds-input-base__input confirm-password-input__input-base" id="confirmPassword" type="password" name="confirmPassword" aria-label="Confirma tu contraseña" autocomplete="new-password" placeholder=" " required>
+                                    <div class="zds-input-base__border"></div>
+                                    <div class="zds-input-base__slot" id="confirmPasswordError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="zds-button generic-form-submit-button register-form__submit-button zds-button--primary zds-button--small">
+                            Crear cuenta
+                        </button>
+                        <div class="login-options">
+                            <p>¿Ya tienes una cuenta?</p>
+                            <button type="button" id="goToLoginBtn" class="zds-button zds-button--secondary zds-button--small">
+                                Iniciar sesión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Principal -->
+    <div id="dashboardScreen" class="screen">
+        <!-- Sticky Menu Toggle -->
+        <div class="sticky-menu">
+            <input id="checkbox" type="checkbox">
+            <label class="toggle" for="checkbox">
+                <div id="bar1" class="bars"></div>
+                <div id="bar2" class="bars"></div>
+                <div id="bar3" class="bars"></div>
+            </label>
+            
+            <!-- Mobile Menu Content -->
+            <div class="mobile-menu">
+                <div class="input">
+                    <button class="value" data-screen="resumen">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.491-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                        </svg>
+                        Resumen
+                    </button>
+                    <button class="value" data-screen="presupuestos">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                            <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/>
+                        </svg>
+                        Presupuestos
+                    </button>
+                    <button class="value" data-screen="clientes">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                        </svg>
+                        Clientes
+                    </button>
+                    <button class="value" data-screen="contenido">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zm-5.146-5.146-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708z"/>
+                        </svg>
+                        Contenido Guardado
+                    </button>
+                    <button class="value" data-screen="calendario">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                        </svg>
+                        Calendario
+                    </button>
+                    <button class="value" data-screen="configuracion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                        </svg>
+                        Configuración
+                    </button>
+                    <button class="value" id="mobileLogoutBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M7.5 1v7h1V1h-1z"/>
+                            <path d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/>
+                        </svg>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overlay para el sidebar -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <button class="sidebar-tab active" data-screen="resumen">Resumen</button>
+                    <button class="sidebar-tab" data-screen="presupuestos">Presupuestos</button>
+                    <button class="sidebar-tab" data-screen="clientes">Clientes</button>
+                    <button class="sidebar-tab" data-screen="contenido">Contenido Guardado</button>
+                    <button class="sidebar-tab" data-screen="calendario">Calendario</button>
+                    <button class="sidebar-tab" data-screen="configuracion">Configuración</button>
+                </nav>
+                <button id="logoutBtn" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1h-1z"/>
+                        <path d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="dashboard-main">
+                <div class="container">
+                    <div id="resumenScreen" class="content-screen active">
+                        <h1 class="screen-title">Resumen del Sistema</h1>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalPresupuestos">0</div>
+                                <div class="stat-label">Total Presupuestos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="inversionTotal">€0.00</div>
+                                <div class="stat-label">Inversión Total</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="gananciaTotal">€0.00</div>
+                                <div class="stat-label">Ganancia Total</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="rentabilidadPromedio">0%</div>
+                                <div class="stat-label">Rentabilidad Promedio</div>
+                            </div>
+                        </div>
+                        <div class="section-container">
+                            <h3 class="section-title">Presupuestos Recientes</h3>
+                            <div id="presupuestosRecientes" class="recent-list">
+                                <p class="empty-state">No hay presupuestos generados aún.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="presupuestosScreen" class="content-screen">
+                        <h1 class="screen-title">Generador de Presupuestos</h1>
+                        <div class="section-container">
+                            <div class="presupuesto-grid">
+                                <div>
+                                    <div class="modelo-info">
+                                        <div class="modelo-title">Modelo fijo: SINTRA (100% algodón, 155 g/m²)</div>
+                                        <div>Selecciona color, cantidad y tamaño del diseño para aplicar precios y calcular el área total necesaria, comparando opciones de lámina y mostrando métricas financieras.</div>
+                                    </div>
+                                    <h3 class="section-title" style="font-size: 1.25rem; margin-bottom: 20px;">Datos del Pedido</h3>
+                                    <div class="input-group">
+                                        <label class="input-label" for="colorCamiseta">Color de la camiseta</label>
+                                        <select id="colorCamiseta" class="input-select">
+                                            <option value="blanco">Blanco</option>
+                                            <option value="negro">Negro</option>
+                                            <option value="rojo">Rojo</option>
+                                            <option value="amarillo">Amarillo</option>
+                                            <option value="marino">Marino</option>
+                                            <option value="gris-vigore">Gris Vigore</option>
+                                            <option value="verde-botella">Verde Botella</option>
+                                            <option value="azul-royal">Azul Royal Melange</option>
+                                            <option value="rosa-claro">Rosa Claro</option>
+                                            <option value="rosetto">Rosetto</option>
+                                            <option value="celeste">Celeste</option>
+                                            <option value="verde-menta">Verde Menta</option>
+                                            <option value="alta-granada">Alta Granada</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label" for="cantidadCamisetas">Cantidad de Camisetas <span style="color: var(--color-danger);">*</span></label>
+                                        <input type="number" id="cantidadCamisetas" class="input-field" value="6" min="1" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Tamaño del Diseño (cm) <span style="color: var(--color-danger);">*</span></label>
+                                        <div class="inline-inputs">
+                                            <div>
+                                                <label class="input-label" for="anchoDiseno" style="font-size: 0.75rem; text-transform: none; font-weight: 500;">Ancho</label>
+                                                <input type="number" id="anchoDiseno" class="input-field" value="30" min="1" required>
+                                            </div>
+                                            <div>
+                                                <label class="input-label" for="altoDiseno" style="font-size: 0.75rem; text-transform: none; font-weight: 500;">Alto</label>
+                                                <input type="number" id="altoDiseno" class="input-field" value="30" min="1" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label" for="margenDisenos">Margen entre diseños (cm)</label>
+                                        <input type="number" id="margenDisenos" class="input-field" value="1" min="0" step="0.1">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label" for="costeImpresion">Coste de impresión por lámina (€)</label>
+                                        <input type="number" id="costeImpresion" class="input-field" value="0" min="0" step="0.01">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label" for="precioVenta">Precio de Venta por Camiseta (€) <span style="color: var(--color-danger);">*</span></label>
+                                        <input type="number" id="precioVenta" class="input-field" value="15" min="0" step="0.01" required>
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                        <button id="calcularBtn" class="calculate-btn">Calcular Presupuesto</button>
+                                        <button id="guardarBtn" class="save-btn" style="display: none;">Guardar Presupuesto</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="section-title" style="font-size: 1.25rem; margin-bottom: 20px;">Resultados</h3>
+                                    <div id="resultadosPresupuesto" class="results-container">
+                                        <p class="empty-state">Complete los datos y haga clic en "Calcular Presupuesto" para ver los resultados.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="clientesScreen" class="content-screen">
+                        <h1 class="screen-title">Gestión de Clientes</h1>
+                        <div class="section-container">
+                            <h3 class="section-title">Nuevo Cliente</h3>
+                            <div class="cliente-form-grid">
+                                <div>
+                                    <div class="form-section">
+                                        <div class="form-section-title">Información Básica</div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteIglesia">Iglesia <span style="color: var(--color-danger);">*</span></label>
+                                            <input type="text" id="clienteIglesia" class="input-field" placeholder="Nombre de la iglesia" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteDenominacion">Denominación</label>
+                                            <input type="text" id="clienteDenominacion" class="input-field" placeholder="Denominación religiosa">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteCiudad">Ciudad/Provincia</label>
+                                            <input type="text" id="clienteCiudad" class="input-field" placeholder="Ciudad y provincia">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteContacto">Contacto <span style="color: var(--color-danger);">*</span></label>
+                                            <input type="text" id="clienteContacto" class="input-field" placeholder="Nombre del contacto" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteCargo">Cargo del contacto</label>
+                                            <input type="text" id="clienteCargo" class="input-field" placeholder="Cargo o responsabilidad">
+                                        </div>
+                                    </div>
+                                    <div class="form-section">
+                                        <div class="form-section-title">Contacto</div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteTelefono">Teléfono/WhatsApp</label>
+                                            <input type="text" id="clienteTelefono" class="input-field" placeholder="Número de contacto">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteEmail">Email</label>
+                                            <input type="email" id="clienteEmail" class="input-field" placeholder="Correo electrónico">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteDireccion">Dirección</label>
+                                            <textarea id="clienteDireccion" class="input-textarea" placeholder="Dirección completa"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="form-section">
+                                        <div class="form-section-title">Detalles del Evento</div>
+                                        <div class="input-group">
+                                            <label class="input-label">Tipo de Evento</label>
+                                            <div class="radio-group">
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="congreso-jovenes" checked> Congreso Jóvenes</label>
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="cibe-mujeres"> CIBE Mujeres</label>
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="vigilia"> Vigilia</label>
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="campamento"> Campamento</label>
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="retiro"> Retiro</label>
+                                                <label class="radio-option"><input type="radio" name="tipoEvento" value="otro"> Otro</label>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteAsistentes">Número de Asistentes</label>
+                                            <input type="number" id="clienteAsistentes" class="input-field" placeholder="Asistentes esperados" min="1">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteDescripcion">Descripción del Evento</label>
+                                            <textarea id="clienteDescripcion" class="input-textarea" placeholder="Detalles adicionales del evento"></textarea>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteFechaEvento">Fecha del Evento</label>
+                                            <input type="date" id="clienteFechaEvento" class="input-field">
+                                        </div>
+                                    </div>
+                                    <div class="form-section">
+                                        <div class="form-section-title">Pedido de Camisetas</div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteCantidad">Cantidad Total de Camisetas</label>
+                                            <input type="number" id="clienteCantidad" class="input-field" placeholder="Total de camisetas" min="1">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label" for="clienteEstado">Estado del Pedido</label>
+                                            <select id="clienteEstado" class="input-select">
+                                                <option value="pc">Pendiente Contacto</option>
+                                                <option value="ep">En Proceso</option>
+                                                <option value="ea">Esperando Aprobación</option>
+                                                <option value="cf">Confirmado</option>
+                                                <option value="pr">En Producción</option>
+                                                <option value="en">Entregado</option>
+                                                <option value="ce">Cerrado</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Distribución de Tallas</label>
+                                            <div class="tallas-grid">
+                                                <div class="talla-item"><label class="talla-label">XS</label><input type="number" id="tallaXS" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">S</label><input type="number" id="tallaS" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">M</label><input type="number" id="tallaM" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">L</label><input type="number" id="tallaL" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">XL</label><input type="number" id="tallaXL" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">2XL</label><input type="number" id="talla2XL" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">3XL</label><input type="number" id="talla3XL" class="input-field" min="0" placeholder="0"></div>
+                                                <div class="talla-item"><label class="talla-label">4XL</label><input type="number" id="talla4XL" class="input-field" min="0" placeholder="0"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="addClienteBtn" class="add-cliente-btn">Agregar Cliente</button>
+                            <div class="clientes-list">
+                                <h3 class="section-title">Clientes Registrados</h3>
+                                <div id="listaClientes">
+                                    <p class="empty-state">No hay clientes registrados aún.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="contenidoScreen" class="content-screen">
+                        <h1 class="screen-title">Contenido Guardado</h1>
+                        <div class="section-container">
+                            <div class="contenido-tabs">
+                                <button class="contenido-tab active" data-contenido="presupuestos">Presupuestos</button>
+                                <button class="contenido-tab" data-contenido="clientes">Clientes</button>
+                                <button class="contenido-tab" data-contenido="eventos">Eventos</button>
+                            </div>
+                            <div class="search-filters">
+                                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por palabra clave...">
+                                <select id="filterSelect" class="filter-select"><option value="">Todos</option></select>
+                                <button id="clearFiltersBtn" class="clear-filters-btn">Limpiar</button>
+                            </div>
+                            <div id="contenidoList" class="contenido-list">
+                                <p class="empty-state">No hay contenido guardado para mostrar.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="calendarioScreen" class="content-screen">
+                        <h1 class="screen-title">Calendario de Eventos</h1>
+                        <div class="section-container">
+                            <div class="calendar-header">
+                                <h2 id="mesActual"></h2>
+                                <div class="calendar-controls">
+                                    <select id="monthSelect"></select>
+                                    <select id="yearSelect"></select>
+                                </div>
+                                <div class="calendar-nav">
+                                    <button id="mesAnterior" class="calendar-nav-btn" title="Mes anterior">◁</button>
+                                    <button id="mesSiguiente" class="calendar-nav-btn" title="Mes siguiente">▷</button>
+                                </div>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-day-header">Lun</div>
+                                <div class="calendar-day-header">Mar</div>
+                                <div class="calendar-day-header">Mié</div>
+                                <div class="calendar-day-header">Jue</div>
+                                <div class="calendar-day-header">Vie</div>
+                                <div class="calendar-day-header">Sáb</div>
+                                <div class="calendar-day-header">Dom</div>
+                            </div>
+                            <div id="calendarioGrid" class="calendar-grid"></div>
+                        </div>
+                    </div>
+
+                    <div id="configuracionScreen" class="content-screen">
+                        <h1 class="screen-title">Configuración</h1>
+                        <h2 class="section-title" style="margin-top: 20px;">Base de Datos</h2>
+                        <div class="database-actions">
+                            <div class="action-card">
+                                <h3>Exportar Datos</h3>
+                                <p>Descarga una copia de seguridad de todos tus datos en formato JSON.</p>
+                                <button id="exportBtn" class="action-btn export">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    Exportar
+                                </button>
+                            </div>
+                            <div class="action-card">
+                                <h3>Importar Datos</h3>
+                                <p>Carga datos desde un archivo de respaldo previamente exportado.</p>
+                                <button id="importBtn" class="action-btn import">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    Importar
+                                </button>
+                                <input type="file" id="importFile" accept=".json" style="display: none;">
+                            </div>
+                            <div class="action-card">
+                                <h3>Eliminar Todo</h3>
+                                <p>Borra permanentemente todos los datos del sistema. Esta acción es irreversible.</p>
+                                <button id="deleteBtn" class="action-btn delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="section-container database-info">
+                            <h3 class="section-title">Información del Sistema</h3>
+                            <div class="info-grid">
+                                <div class="info-item"><span>Total Presupuestos:</span><strong id="dbTotalPresupuestos">0</strong></div>
+                                <div class="info-item"><span>Total Clientes:</span><strong id="dbTotalClientes">0</strong></div>
+                                <div class="info-item"><span>Total Eventos:</span><strong id="dbTotalEventos">0</strong></div>
+                                <div class="info-item"><span>Última Exportación:</span><strong id="dbUltimaExportacion">N/A</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="event-modal-title">Detalles del Evento</h2>
+            <div id="eventModalDetails" class="event-modal-details"></div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="detail-modal">
+        <div class="detail-modal-content">
+            <div class="detail-modal-header">
+                <h2 class="detail-modal-title" id="detailModalTitle">Detalles</h2>
+                <span class="close-detail-modal">&times;</span>
+            </div>
+            <div id="detailModalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // === SISTEMA DE TEMAS ===
+        function setTheme(theme) {
+            const htmlElement = document.documentElement;
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.setAttribute('data-state', '');
+            });
+            document.querySelector(`.theme-btn[aria-label="${theme}"]`).setAttribute('data-state', 'active');
+            
+            // Aplicar tema
+            if (theme === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                htmlElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                localStorage.setItem('sintra_theme', 'system');
+            } else {
+                htmlElement.setAttribute('data-theme', theme);
+                localStorage.setItem('sintra_theme', theme);
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('sintra_theme') || 'system';
+            setTheme(savedTheme);
+        }
+
+        // Detectar cambios en preferencia del sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            const savedTheme = localStorage.getItem('sintra_theme');
+            if (savedTheme === 'system') {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // === SISTEMA DE USUARIOS ===
+        let users = JSON.parse(localStorage.getItem('sintra_users')) || [];
+        
+        if (!users.find(u => u.username === 'admin')) {
+            users.push({
+                username: 'admin',
+                password: 'admin',
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('sintra_users', JSON.stringify(users));
+        }
+
+        // Constantes
+        const PRECIOS_CAMISETAS = {
+            blanco: 2.55, negro: 2.55, rojo: 2.55, amarillo: 2.55, marino: 2.55,
+            'gris-vigore': 2.55, 'verde-botella': 2.55, 'azul-royal': 2.55,
+            'rosa-claro': 2.55, rosetto: 2.55, celeste: 2.55, 'verde-menta': 2.55, 'alta-granada': 2.55
+        };
+        const CAMISETAS_POR_PACK = 5;
+        const RECARGO_SUELTA = 1;
+        const LAMINAS = {
+            GRANDE: { ancho: 58, alto: 100, precio: 12 },
+            MEDIANA: { ancho: 30, precioBase: 7, precioPromocion: 6, metrosMinimoPromocion: 3 }
+        };
+        
+        let sintraData = {
+            presupuestos: [],
+            clientes: [],
+            eventos: [],
+            configuracion: { version: "1.0", ultimaExportacion: null }
+        };
+        let presupuestoActual = null;
+        let fechaActual = new Date();
+        let currentContenidoType = 'presupuestos';
+        let filteredContent = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme(); // Cargar tema al inicio
+            loadData();
+            setupEventListeners();
+            setupRegistration();
+            updateDashboardStats();
+            updateClientesList();
+            renderCalendar();
+            updateContenidoGuardado();
+        });
+
+        function loadData() {
+            const savedData = localStorage.getItem('sintra_database');
+            if (savedData) {
+                sintraData = JSON.parse(savedData);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('sintra_database', JSON.stringify(sintraData));
+        }
+
+        function setupRegistration() {
+            document.getElementById('goToRegisterBtn').addEventListener('click', showRegisterScreen);
+            document.getElementById('goToLoginBtn').addEventListener('click', showLoginScreen);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerPassword').addEventListener('input', checkPasswordStrength);
+        }
+
+        function showRegisterScreen() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('registerScreen').classList.add('active');
+            document.getElementById('registerForm').reset();
+            clearRegisterErrors();
+        }
+
+        function showLoginScreen() {
+            document.getElementById('registerScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('active');
+            document.getElementById('loginForm').reset();
+            clearLoginErrors();
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('registerPassword').value;
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            let text = 'Seguridad de la contraseña';
+            
+            if (password.length >= 8) strength += 1;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+            if (password.match(/\d/)) strength += 1;
+            if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+            
+            strengthBar.className = 'strength-fill';
+            
+            if (password.length > 0) {
+                if (strength === 1) {
+                    strengthBar.classList.add('strength-weak');
+                    text = 'Débil';
+                } else if (strength === 2) {
+                    strengthBar.classList.add('strength-medium');
+                    text = 'Media';
+                } else if (strength >= 3) {
+                    strengthBar.classList.add('strength-strong');
+                    text = 'Fuerte';
+                }
+            }
+            
+            strengthText.textContent = text;
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            clearRegisterErrors();
+            
+            let hasErrors = false;
+            
+            if (username.length < 3) {
+                showRegisterError('registerUsernameError', 'El usuario debe tener al menos 3 caracteres');
+                hasErrors = true;
+            }
+            
+            if (users.find(u => u.username === username)) {
+                showRegisterError('registerUsernameError', 'Este usuario ya existe');
+                hasErrors = true;
+            }
+            
+            if (password.length < 6) {
+                showRegisterError('registerPasswordError', 'La contraseña debe tener al menos 6 caracteres');
+                hasErrors = true;
+            }
+            
+            if (password !== confirmPassword) {
+                showRegisterError('confirmPasswordError', 'Las contraseñas no coinciden');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) return;
+            
+            users.push({
+                username: username,
+                password: password,
+                createdAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('sintra_users', JSON.stringify(users));
+            
+            alert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
+            showLoginScreen();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+
+            clearLoginErrors();
+
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                document.getElementById('loginScreen').classList.remove('active');
+                document.getElementById('dashboardScreen').classList.add('active');
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                document.getElementById('loginForm').reset();
+            } else {
+                showLoginError('passwordError', 'Usuario o contraseña incorrectos');
+            }
+        }
+
+        function showRegisterError(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+        function showLoginError(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+
+        function clearRegisterErrors() {
+            document.getElementById('registerUsernameError').textContent = '';
+            document.getElementById('registerPasswordError').textContent = '';
+            document.getElementById('confirmPasswordError').textContent = '';
+        }
+
+        function clearLoginErrors() {
+            document.getElementById('usernameError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+        }
+
+        function setupEventListeners() {
+            // Desktop Sidebar navigation
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    document.querySelectorAll('.content-screen').forEach(screen => screen.classList.remove('active'));
+                    document.getElementById(`${tab.dataset.screen}Screen`).classList.add('active');
+
+                    if (tab.dataset.screen === 'calendario') renderCalendar();
+                    if (tab.dataset.screen === 'clientes') updateClientesList();
+                    if (tab.dataset.screen === 'configuracion') updateDatabaseInfo();
+                    if (tab.dataset.screen === 'contenido') updateContenidoGuardado();
+                });
+            });
+
+            // Mobile Menu navigation
+            document.querySelectorAll('.value[data-screen]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const screen = btn.dataset.screen;
+                    document.querySelectorAll('.content-screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById(`${screen}Screen`).classList.add('active');
+                    document.querySelectorAll('.sidebar-tab').forEach(tab => tab.classList.remove('active'));
+                    const correspondingTab = document.querySelector(`.sidebar-tab[data-screen="${screen}"]`);
+                    if (correspondingTab) correspondingTab.classList.add('active');
+                    
+                    document.getElementById('checkbox').checked = false;
+                    document.getElementById('sidebar').classList.remove('sidebar-open');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Sticky menu & overlay
+            const checkbox = document.getElementById('checkbox');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    sidebar.classList.add('sidebar-open');
+                    sidebarOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    sidebar.classList.remove('sidebar-open');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            sidebarOverlay.addEventListener('click', function() {
+                checkbox.checked = false;
+                sidebar.classList.remove('sidebar-open');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            document.getElementById('calcularBtn').addEventListener('click', calcularPresupuesto);
+            document.getElementById('guardarBtn').addEventListener('click', guardarPresupuesto);
+            document.getElementById('addClienteBtn').addEventListener('click', agregarCliente);
+
+            document.querySelectorAll('.contenido-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.contenido-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentContenidoType = tab.dataset.contenido;
+                    updateContenidoGuardado();
+                });
+            });
+            document.getElementById('searchInput').addEventListener('input', filterContent);
+            document.getElementById('filterSelect').addEventListener('change', filterContent);
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+
+            document.getElementById('mesAnterior').addEventListener('click', () => {
+                fechaActual.setMonth(fechaActual.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('mesSiguiente').addEventListener('click', () => {
+                fechaActual.setMonth(fechaActual.getMonth() + 1);
+                renderCalendar();
+            });
+            document.getElementById('monthSelect').addEventListener('change', (event) => {
+                fechaActual.setMonth(parseInt(event.target.value));
+                renderCalendar();
+            });
+            document.getElementById('yearSelect').addEventListener('change', (event) => {
+                fechaActual.setFullYear(parseInt(event.target.value));
+                renderCalendar();
+            });
+
+            document.querySelector('.close-button').addEventListener('click', () => {
+                document.getElementById('eventModal').style.display = 'none';
+            });
+            document.querySelector('.close-detail-modal').addEventListener('click', () => {
+                document.getElementById('detailModal').style.display = 'none';
+            });
+            window.addEventListener('click', (event) => {
+                if (event.target == document.getElementById('eventModal')) {
+                    document.getElementById('eventModal').style.display = 'none';
+                }
+                if (event.target == document.getElementById('detailModal')) {
+                    document.getElementById('detailModal').style.display = 'none';
+                }
+            });
+
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', importData);
+            document.getElementById('deleteBtn').addEventListener('click', deleteAllData);
+
+            // Botones de cierre de sesión
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('mobileLogoutBtn').addEventListener('click', logout);
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                sessionStorage.removeItem('currentUser');
+                document.getElementById('dashboardScreen').classList.remove('active');
+                document.getElementById('loginScreen').classList.add('active');
+                alert('Sesión cerrada correctamente');
+            }
+        }
+
+        function updateContenidoGuardado() {
+            updateFilterOptions();
+            filterContent();
+        }
+
+        function updateFilterOptions() {
+            const filterSelect = document.getElementById('filterSelect');
+            filterSelect.innerHTML = '<option value="">Todos</option>';
+            switch (currentContenidoType) {
+                case 'presupuestos':
+                    const colores = [...new Set(sintraData.presupuestos.map(p => p.color))];
+                    colores.forEach(color => {
+                        filterSelect.innerHTML += `<option value="color:${color}">${color}</option>`;
+                    });
+                    break;
+                case 'clientes':
+                    const estados = [...new Set(sintraData.clientes.map(c => c.estado))];
+                    const estadoMap = {
+                        pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobacion',
+                        cf: 'Confirmado', pr: 'En Produccion', en: 'Entregado', ce: 'Cerrado'
+                    };
+                    estados.forEach(estado => {
+                        const estadoTexto = estadoMap[estado] || estado;
+                        filterSelect.innerHTML += `<option value="estado:${estado}">${estadoTexto}</option>`;
+                    });
+                    break;
+                case 'eventos':
+                    const estadosEvento = [...new Set(sintraData.eventos.map(e => e.estado))];
+                    estadosEvento.forEach(estado => {
+                        const estadoTexto = estadoMap[estado] || estado;
+                        filterSelect.innerHTML += `<option value="estado:${estado}">${estadoTexto}</option>`;
+                    });
+                    break;
+            }
+        }
+
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterValue = document.getElementById('filterSelect').value;
+
+            let content = [];
+            switch (currentContenidoType) {
+                case 'presupuestos': content = sintraData.presupuestos; break;
+                case 'clientes': content = sintraData.clientes; break;
+                case 'eventos': content = sintraData.eventos; break;
+            }
+
+            filteredContent = content.filter(item => {
+                let matchesSearch = true;
+                if (searchTerm) {
+                    const searchableText = JSON.stringify(item).toLowerCase();
+                    matchesSearch = searchableText.includes(searchTerm);
+                }
+                let matchesFilter = true;
+                if (filterValue) {
+                    const [filterType, filterVal] = filterValue.split(':');
+                    matchesFilter = item[filterType] === filterVal;
+                }
+                return matchesSearch && matchesFilter;
+            });
+            renderContenidoList();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterSelect').value = '';
+            filterContent();
+        }
+
+        function renderContenidoList() {
+            const contenidoList = document.getElementById('contenidoList');
+            if (filteredContent.length === 0) {
+                contenidoList.innerHTML = '<p class="empty-state">No hay contenido que coincida con los filtros.</p>';
+                return;
+            }
+            let html = '';
+            filteredContent.forEach(item => {
+                html += renderContenidoItem(item);
+            });
+            contenidoList.innerHTML = html;
+        }
+
+        function renderContenidoItem(item) {
+            switch (currentContenidoType) {
+                case 'presupuestos': return renderPresupuestoItem(item);
+                case 'clientes': return renderClienteItem(item);
+                case 'eventos': return renderEventoItem(item);
+                default: return '';
+            }
+        }
+
+        function renderPresupuestoItem(presupuesto) {
+            const fecha = new Date(presupuesto.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+            return `
+                <div class="contenido-item" onclick="showDetailModal('presupuesto', '${presupuesto.id}')">
+                    <div class="item-header">
+                        <div class="item-title">Presupuesto ${presupuesto.color} - ${presupuesto.cantidad} camisas</div>
+                        <div class="item-date">${fecha}</div>
+                    </div>
+                    <div class="item-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Inversión:</span>
+                            <span class="detail-value">€${presupuesto.resultados.inversionTotal.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ganancia:</span>
+                            <span class="detail-value">€${presupuesto.resultados.ganancia.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Rentabilidad:</span>
+                            <span class="detail-value">${presupuesto.resultados.rentabilidad.toFixed(1)}%</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Precio Venta:</span>
+                            <span class="detail-value">€${presupuesto.precioVenta.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn-small" onclick="event.stopPropagation(); duplicatePresupuesto('${presupuesto.id}')">Duplicar</button>
+                        <button class="action-btn-small secondary" onclick="event.stopPropagation(); showDetailModal('presupuesto', '${presupuesto.id}')">Ver Detalles</button>
+                        <button class="action-btn-small danger" onclick="event.stopPropagation(); deleteItem('presupuesto', '${presupuesto.id}')">Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderClienteItem(cliente) {
+            const fecha = new Date(cliente.fechaRegistro).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+            const estadoMap = {
+                pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobacion',
+                cf: 'Confirmado', pr: 'En Produccion', en: 'Entregado', ce: 'Cerrado'
+            };
+            const estadoTexto = estadoMap[cliente.estado] || cliente.estado;
+            return `
+                <div class="contenido-item" onclick="showDetailModal('cliente', '${cliente.id}')">
+                    <div class="item-header">
+                        <div class="item-title">${cliente.iglesia} (${cliente.contacto})</div>
+                        <div class="item-date">${fecha}</div>
+                    </div>
+                    <div class="item-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Estado:</span>
+                            <span class="detail-value">${estadoTexto}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ciudad:</span>
+                            <span class="detail-value">${cliente.ciudad || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Evento:</span>
+                            <span class="detail-value">${cliente.tipoEvento || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Cantidad:</span>
+                            <span class="detail-value">${cliente.cantidad || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn-small secondary" onclick="event.stopPropagation(); showDetailModal('cliente', '${cliente.id}')">Ver Detalles</button>
+                        <button class="action-btn-small danger" onclick="event.stopPropagation(); deleteItem('cliente', '${cliente.id}')">Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEventoItem(evento) {
+            const fecha = new Date(evento.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+            const estadoMap = {
+                pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobacion',
+                cf: 'Confirmado', pr: 'En Produccion', en: 'Entregado', ce: 'Cerrado'
+            };
+            const estadoTexto = estadoMap[evento.estado] || evento.estado;
+            return `
+                <div class="contenido-item" onclick="showDetailModal('evento', '${evento.id}')">
+                    <div class="item-header">
+                        <div class="item-title">${evento.titulo}</div>
+                        <div class="item-date">${fecha}</div>
+                    </div>
+                    <div class="item-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Estado:</span>
+                            <span class="detail-value">${estadoTexto}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Descripción:</span>
+                            <span class="detail-value">${evento.descripcion || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn-small secondary" onclick="event.stopPropagation(); showDetailModal('evento', '${evento.id}')">Ver Detalles</button>
+                        <button class="action-btn-small danger" onclick="event.stopPropagation(); deleteItem('evento', '${evento.id}')">Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showDetailModal(type, id) {
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('detailModalTitle');
+            const content = document.getElementById('detailModalContent');
+
+            let item;
+            switch (type) {
+                case 'presupuesto':
+                    item = sintraData.presupuestos.find(p => p.id === id);
+                    title.textContent = 'Detalles del Presupuesto';
+                    content.innerHTML = renderPresupuestoDetails(item);
+                    break;
+                case 'cliente':
+                    item = sintraData.clientes.find(c => c.id === id);
+                    title.textContent = 'Detalles del Cliente';
+                    content.innerHTML = renderClienteDetails(item);
+                    break;
+                case 'evento':
+                    item = sintraData.eventos.find(e => e.id === id);
+                    title.textContent = 'Detalles del Evento';
+                    content.innerHTML = renderEventoDetails(item);
+                    break;
+            }
+            modal.style.display = 'block';
+        }
+
+        function renderPresupuestoDetails(presupuesto) {
+            if (!presupuesto) return '<p>Presupuesto no encontrado.</p>';
+            return `
+                <div class="detail-section">
+                    <div class="detail-section-title">Información General</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Fecha:</span><span class="detail-item-value">${new Date(presupuesto.fecha).toLocaleDateString()}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Color:</span><span class="detail-item-value">${presupuesto.color}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Cantidad:</span><span class="detail-item-value">${presupuesto.cantidad} camisas</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Precio Venta:</span><span class="detail-item-value">€${presupuesto.precioVenta.toFixed(2)}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Diseño</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Ancho:</span><span class="detail-item-value">${presupuesto.ancho} cm</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Alto:</span><span class="detail-item-value">${presupuesto.alto} cm</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Margen:</span><span class="detail-item-value">${presupuesto.margen} cm</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Coste Impresión:</span><span class="detail-item-value">€${presupuesto.costeImpresion.toFixed(2)}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Análisis Financiero</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Inversión Total:</span><span class="detail-item-value">€${presupuesto.resultados.inversionTotal.toFixed(2)}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Ingresos:</span><span class="detail-item-value">€${presupuesto.resultados.ingresos.toFixed(2)}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Ganancia:</span><span class="detail-item-value">€${presupuesto.resultados.ganancia.toFixed(2)}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Rentabilidad:</span><span class="detail-item-value">${presupuesto.resultados.rentabilidad.toFixed(1)}%</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Mejor Opción de Lámina</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Tipo:</span><span class="detail-item-value">${presupuesto.resultados.mejorOpcion.nombre}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Tamaño:</span><span class="detail-item-value">${presupuesto.resultados.mejorOpcion.tamaño}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Láminas Necesarias:</span><span class="detail-item-value">${presupuesto.resultados.mejorOpcion.laminasNecesarias}</span></div>
+                        ${presupuesto.resultados.mejorOpcion.metrosNecesarios ? `<div class="detail-item"><span class="detail-item-label">Metros Necesarios:</span><span class="detail-item-value">${presupuesto.resultados.mejorOpcion.metrosNecesarios} m</span></div>` : ''}
+                        <div class="detail-item"><span class="detail-item-label">Coste Total:</span><span class="detail-item-value">€${presupuesto.resultados.mejorOpcion.costeTotal.toFixed(2)}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderClienteDetails(cliente) {
+            if (!cliente) return '<p>Cliente no encontrado.</p>';
+            const estadoMap = { pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobacion', cf: 'Confirmado', pr: 'En Produccion', en: 'Entregado', ce: 'Cerrado' };
+            return `
+                <div class="detail-section">
+                    <div class="detail-section-title">Información Básica</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Iglesia:</span><span class="detail-item-value">${cliente.iglesia}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Denominación:</span><span class="detail-item-value">${cliente.denominacion || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Ciudad:</span><span class="detail-item-value">${cliente.ciudad || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Contacto:</span><span class="detail-item-value">${cliente.contacto}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Cargo:</span><span class="detail-item-value">${cliente.cargo || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Estado:</span><span class="detail-item-value">${estadoMap[cliente.estado] || cliente.estado}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Información de Contacto</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Teléfono:</span><span class="detail-item-value">${cliente.telefono || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Email:</span><span class="detail-item-value">${cliente.email || 'N/A'}</span></div>
+                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-item-label">Dirección:</span><span class="detail-item-value">${cliente.direccion || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Fecha Registro:</span><span class="detail-item-value">${new Date(cliente.fechaRegistro).toLocaleDateString()}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Detalles del Evento</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Tipo:</span><span class="detail-item-value">${cliente.tipoEvento || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Asistentes:</span><span class="detail-item-value">${cliente.asistentes || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Fecha Evento:</span><span class="detail-item-value">${cliente.fechaEvento ? new Date(cliente.fechaEvento).toLocaleDateString() : 'N/A'}</span></div>
+                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-item-label">Descripción:</span><span class="detail-item-value">${cliente.descripcion || 'N/A'}</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Pedido de Camisetas</div>
+                    <div class="detail-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                        <div class="detail-item"><span class="detail-item-label">Cantidad Total:</span><span class="detail-item-value">${cliente.cantidad || 'N/A'}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">XS:</span><span class="detail-item-value">${cliente.tallas?.xs || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">S:</span><span class="detail-item-value">${cliente.tallas?.s || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">M:</span><span class="detail-item-value">${cliente.tallas?.m || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">L:</span><span class="detail-item-value">${cliente.tallas?.l || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">XL:</span><span class="detail-item-value">${cliente.tallas?.xl || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">2XL:</span><span class="detail-item-value">${cliente.tallas?.['2xl'] || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">3XL:</span><span class="detail-item-value">${cliente.tallas?.['3xl'] || 0}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">4XL:</span><span class="detail-item-value">${cliente.tallas?.['4xl'] || 0}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEventoDetails(evento) {
+            if (!evento) return '<p>Evento no encontrado.</p>';
+            const estadoMap = { pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobacion', cf: 'Confirmado', pr: 'En Produccion', en: 'Entregado', ce: 'Cerrado' };
+            return `
+                <div class="detail-section">
+                    <div class="detail-section-title">Información del Evento</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-item-label">Título:</span><span class="detail-item-value">${evento.titulo}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Fecha:</span><span class="detail-item-value">${new Date(evento.fecha).toLocaleDateString()}</span></div>
+                        <div class="detail-item"><span class="detail-item-label">Estado:</span><span class="detail-item-value">${estadoMap[evento.estado] || evento.estado}</span></div>
+                        <div class="detail-item" style="grid-column: 1 / -1;"><span class="detail-item-label">Descripción:</span><span class="detail-item-value">${evento.descripcion || 'N/A'}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function duplicatePresupuesto(id) {
+            const presupuesto = sintraData.presupuestos.find(p => p.id === id);
+            if (!presupuesto) return;
+            document.querySelector('.sidebar-tab[data-screen="presupuestos"]').click();
+            document.getElementById('colorCamiseta').value = presupuesto.color;
+            document.getElementById('cantidadCamisetas').value = presupuesto.cantidad;
+            document.getElementById('anchoDiseno').value = presupuesto.ancho;
+            document.getElementById('altoDiseno').value = presupuesto.alto;
+            document.getElementById('margenDisenos').value = presupuesto.margen;
+            document.getElementById('costeImpresion').value = presupuesto.costeImpresion;
+            document.getElementById('precioVenta').value = presupuesto.precioVenta;
+            alert('Presupuesto duplicado. Puede modificar los valores y calcular nuevamente.');
+        }
+
+        function deleteItem(type, id) {
+            if (!confirm('¿Está seguro de que desea eliminar este elemento?')) return;
+            switch (type) {
+                case 'presupuesto':
+                    sintraData.presupuestos = sintraData.presupuestos.filter(p => p.id !== id);
+                    break;
+                case 'cliente':
+                    sintraData.clientes = sintraData.clientes.filter(c => c.id !== id);
+                    sintraData.eventos = sintraData.eventos.filter(e => !e.titulo.includes(sintraData.clientes.find(c => c.id === id)?.iglesia || ''));
+                    break;
+                case 'evento':
+                    sintraData.eventos = sintraData.eventos.filter(e => e.id !== id);
+                    break;
+            }
+            saveData();
+            updateContenidoGuardado();
+            updateDashboardStats();
+            updateClientesList();
+            renderCalendar();
+            alert('Elemento eliminado correctamente.');
+        }
+
+        function updateDashboardStats() {
+            const totalPresupuestos = sintraData.presupuestos.length;
+            let inversionTotal = 0;
+            let gananciaTotal = 0;
+            sintraData.presupuestos.forEach(p => {
+                inversionTotal += p.resultados.inversionTotal;
+                gananciaTotal += p.resultados.ganancia;
+            });
+            const rentabilidadPromedio = inversionTotal > 0 ? (gananciaTotal / inversionTotal) * 100 : 0;
+
+            document.getElementById('totalPresupuestos').textContent = totalPresupuestos;
+            document.getElementById('inversionTotal').textContent = `€${inversionTotal.toFixed(2)}`;
+            document.getElementById('gananciaTotal').textContent = `€${gananciaTotal.toFixed(2)}`;
+            document.getElementById('rentabilidadPromedio').textContent = `${rentabilidadPromedio.toFixed(1)}%`;
+
+            const presupuestosRecientesDiv = document.getElementById('presupuestosRecientes');
+            if (totalPresupuestos === 0) {
+                presupuestosRecientesDiv.innerHTML = '<p class="empty-state">No hay presupuestos generados aún.</p>';
+            } else {
+                let html = '';
+                sintraData.presupuestos.slice(-3).reverse().forEach(p => {
+                    html += `
+                        <div class="cliente-card">
+                            <div class="cliente-header">
+                                <div class="cliente-title">Presupuesto para ${p.color} - ${p.cantidad} camisas</div>
+                                <span class="cliente-status" style="background: var(--color-accent);">Generado</span>
+                            </div>
+                            <div class="cliente-details">
+                                <span>Fecha:</span><span>${new Date(p.fecha).toLocaleDateString()}</span>
+                                <span>Inversión:</span><span>€${p.resultados.inversionTotal.toFixed(2)}</span>
+                                <span>Ganancia:</span><span>€${p.resultados.ganancia.toFixed(2)}</span>
+                                <span>Rentabilidad:</span><span>${p.resultados.rentabilidad.toFixed(1)}%</span>
+                            </div>
+                        </div>`;
+                });
+                presupuestosRecientesDiv.innerHTML = html;
+            }
+        }
+
+        function updateClientesList() {
+            const listaClientesDiv = document.getElementById('listaClientes');
+            if (sintraData.clientes.length === 0) {
+                listaClientesDiv.innerHTML = '<p class="empty-state">No hay clientes registrados aún.</p>';
+            } else {
+                let html = '';
+                sintraData.clientes.forEach(cliente => {
+                    const estadoMap = {
+                        pc: { text: 'Pendiente Contacto', color: '#ef4444' },
+                        ep: { text: 'En Proceso', color: '#f59e0b' },
+                        ea: { text: 'Esperando Aprobación', color: '#d97706' },
+                        cf: { text: 'Confirmado', color: '#16a34a' },
+                        pr: { text: 'En Producción', color: '#3b82f6' },
+                        en: { text: 'Entregado', color: '#059669' },
+                        ce: { text: 'Cerrado', color: '#1f2937' }
+                    };
+                    const estadoInfo = estadoMap[cliente.estado] || { text: 'Desconocido', color: '#6b7280' };
+                    html += `
+                        <div class="cliente-card">
+                            <div class="cliente-header">
+                                <div class="cliente-title">${cliente.iglesia} (${cliente.contacto})</div>
+                                <span class="cliente-status" style="background-color: ${estadoInfo.color};">${estadoInfo.text}</span>
+                            </div>
+                            <div class="cliente-details">
+                                <span>Ciudad:</span><span>${cliente.ciudad || 'N/A'}</span>
+                                <span>Teléfono:</span><span>${cliente.telefono || 'N/A'}</span>
+                                <span>Email:</span><span>${cliente.email || 'N/A'}</span>
+                                <span>Evento:</span><span>${cliente.tipoEvento || 'N/A'}</span>
+                                <span>Fecha Evento:</span><span>${cliente.fechaEvento ? new Date(cliente.fechaEvento).toLocaleDateString() : 'N/A'}</span>
+                                <span>Cantidad Camisetas:</span><span>${cliente.cantidad || 'N/A'}</span>
+                            </div>
+                        </div>`;
+                });
+                listaClientesDiv.innerHTML = html;
+            }
+        }
+
+        function updateDatabaseInfo() {
+            document.getElementById('dbTotalPresupuestos').textContent = sintraData.presupuestos.length;
+            document.getElementById('dbTotalClientes').textContent = sintraData.clientes.length;
+            document.getElementById('dbTotalEventos').textContent = sintraData.eventos.length;
+            document.getElementById('dbUltimaExportacion').textContent = sintraData.configuracion.ultimaExportacion ? new Date(sintraData.configuracion.ultimaExportacion).toLocaleString() : 'N/A';
+        }
+
+        function calcularPresupuesto() {
+            const cantidad = parseInt(document.getElementById('cantidadCamisetas').value);
+            const ancho = parseInt(document.getElementById('anchoDiseno').value);
+            const alto = parseInt(document.getElementById('altoDiseno').value);
+            const margen = parseFloat(document.getElementById('margenDisenos').value);
+            const costeImpresion = 0;
+            const precioVenta = parseFloat(document.getElementById('precioVenta').value);
+            const color = document.getElementById('colorCamiseta').value;
+
+            if (isNaN(cantidad) || cantidad <= 0) { alert('Por favor, introduce una cantidad de camisetas válida.'); return; }
+            if (isNaN(ancho) || ancho <= 0 || isNaN(alto) || alto <= 0) { alert('Por favor, introduce dimensiones de diseño válidas.'); return; }
+            if (isNaN(precioVenta) || precioVenta <= 0) { alert('Por favor, introduce un precio de venta válido.'); return; }
+
+            const resultadoCamisetas = calcularCosteCamisetas(cantidad, color);
+            const opcionesLaminas = calcularOpcionesLaminas(cantidad, ancho, alto, margen, costeImpresion);
+            const mejorOpcion = opcionesLaminas.reduce((min, opcion) => opcion.costeTotal < min.costeTotal ? opcion : min, opcionesLaminas[0]);
+
+            const areaTotal = (ancho * alto * cantidad) / 100;
+            const inversionTotal = resultadoCamisetas.costeTotal + mejorOpcion.costeTotal;
+            const ingresos = cantidad * precioVenta;
+            const ganancia = ingresos - inversionTotal;
+            const rentabilidad = inversionTotal > 0 ? (ganancia / inversionTotal) * 100 : 0;
+
+            presupuestoActual = {
+                color: document.getElementById('colorCamiseta').options[document.getElementById('colorCamiseta').selectedIndex].text,
+                cantidad, ancho, alto, margen, costeImpresion, precioVenta,
+                fecha: new Date().toISOString(),
+                resultados: { resultadoCamisetas, opcionesLaminas, mejorOpcion, areaTotal, inversionTotal, ingresos, ganancia, rentabilidad }
+            };
+
+            mostrarResultados(resultadoCamisetas, opcionesLaminas, mejorOpcion, cantidad, areaTotal, inversionTotal, ingresos, ganancia, rentabilidad, precioVenta);
+            document.getElementById('guardarBtn').style.display = 'inline-block';
+        }
+
+        function calcularCosteCamisetas(cantidad, color) {
+            const precioPorCamiseta = PRECIOS_CAMISETAS[color] || PRECIOS_CAMISETAS.blanco;
+            const packsCompletos = Math.floor(cantidad / CAMISETAS_POR_PACK);
+            const unidadesSueltas = cantidad % CAMISETAS_POR_PACK;
+            const costePacks = packsCompletos * CAMISETAS_POR_PACK * precioPorCamiseta;
+            const precioSuelta = precioPorCamiseta + RECARGO_SUELTA;
+            const costeSueltas = unidadesSueltas * precioSuelta;
+            const costeTotal = costePacks + costeSueltas;
+
+            return { precioPorCamiseta, precioSuelta, packsCompletos, unidadesSueltas, costePacks, costeSueltas, costeTotal };
+        }
+
+        function calcularOpcionesLaminas(cantidad, ancho, alto, margen, costeImpresion) {
+            const opciones = [];
+
+            const diseñosGrande = calcularDiseñosPorLamina(LAMINAS.GRANDE.ancho, LAMINAS.GRANDE.alto, ancho, alto, margen);
+            const laminasGrande = Math.ceil(cantidad / diseñosGrande);
+            const costeGrande = (laminasGrande * LAMINAS.GRANDE.precio) + (laminasGrande * costeImpresion);
+            opciones.push({ tipo: 'GRANDE', nombre: 'Lamina Grande', tamaño: '58–100 cm', precioLamina: LAMINAS.GRANDE.precio, diseñosPorLamina: diseñosGrande, laminasNecesarias: laminasGrande, costeLaminas: laminasGrande * LAMINAS.GRANDE.precio, costeImpresion: laminasGrande * costeImpresion, costeTotal: costeGrande });
+
+            const diseñosPorMetro = Math.floor(100 / (alto + margen));
+            if (diseñosPorMetro > 0) {
+                const metrosNecesarios = Math.ceil(cantidad / diseñosPorMetro);
+                let precioTotalLamina, nombreLamina;
+                if (metrosNecesarios <= LAMINAS.MEDIANA.metrosMinimoPromocion) {
+                    precioTotalLamina = LAMINAS.MEDIANA.precioBase;
+                    nombreLamina = `Lamina Mediana (hasta 3m – 7€ total)`;
+                } else {
+                    precioTotalLamina = metrosNecesarios * LAMINAS.MEDIANA.precioPromocion;
+                    nombreLamina = `Lamina Mediana (${metrosNecesarios}m – 6€/m)`;
+                }
+                const costeTotalImpresion = costeImpresion * metrosNecesarios;
+                const costeMediana = precioTotalLamina + costeTotalImpresion;
+                opciones.push({ tipo: 'MEDIANA', nombre: nombreLamina, tamaño: `30 cm × ${metrosNecesarios} m`, precioLamina: precioTotalLamina, diseñosPorLamina: diseñosPorMetro, laminasNecesarias: metrosNecesarios, costeLaminas: precioTotalLamina, costeImpresion: costeTotalImpresion, costeTotal: costeMediana, metrosNecesarios: metrosNecesarios, esRollo: true });
+            }
+
+            return opciones;
+        }
+
+        function calcularDiseñosPorLamina(anchoLamina, altoLamina, anchoDiseno, altoDiseno, margen) {
+            const diseñosPorFila = Math.floor(anchoLamina / (anchoDiseno + margen));
+            const diseñosPorColumna = Math.floor(altoLamina / (altoDiseno + margen));
+            return diseñosPorFila * diseñosPorColumna;
+        }
+
+        function mostrarResultados(camisetas, opciones, mejor, cantidad, area, inversion, ingresos, ganancia, rentabilidad, precioVenta) {
+            const container = document.getElementById('resultadosPresupuesto');
+            let html = `
+                <div class="result-section">
+                    <div class="result-title">Análisis de Camisetas</div>
+                    <div class="cost-breakdown"><span class="cost-label">Precio por camiseta (en pack):</span><span class="cost-value">€${camisetas.precioPorCamiseta.toFixed(2)}/unidad</span></div>
+                    <div class="cost-breakdown"><span class="cost-label">Precio por pack de 5:</span><span class="cost-value">€${(camisetas.precioPorCamiseta * CAMISETAS_POR_PACK).toFixed(2)}</span></div>
+                    ${camisetas.unidadesSueltas > 0 ? `<div class="cost-breakdown"><span class="cost-label">Precio camiseta suelta (+1€):</span><span class="cost-value">€${camisetas.precioSuelta.toFixed(2)}/unidad</span></div>` : ''}
+                    <div class="cost-breakdown" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border);"><span class="cost-label">Packs (${camisetas.packsCompletos} x 5):</span><span class="cost-value">€${camisetas.costePacks.toFixed(2)}</span></div>
+                    ${camisetas.unidadesSueltas > 0 ? `<div class="cost-breakdown"><span class="cost-label">Sueltas (${camisetas.unidadesSueltas}):</span><span class="cost-value">€${camisetas.costeSueltas.toFixed(2)}</span></div>` : ''}
+                    <div class="total-cost"><div class="cost-breakdown"><span class="cost-label">Total camisetas (${cantidad} uds):</span><span class="cost-value">€${camisetas.costeTotal.toFixed(2)}</span></div></div>
+                </div>
+                <div class="result-section"><div class="result-title">Opciones de Lámina</div>`;
+            opciones.forEach(opcion => {
+                const esRecomendada = opcion.tipo === mejor.tipo;
+                const otraOpcion = opciones.find(o => o.tipo !== opcion.tipo);
+                const ahorro = otraOpcion ? otraOpcion.costeTotal - opcion.costeTotal : 0;
+                html += `
+                    <div class="lamina-option ${esRecomendada ? 'recommended' : ''}">
+                        <div class="lamina-header"><span class="lamina-name">${opcion.nombre}</span>${esRecomendada ? '<span class="lamina-badge">Recomendada</span>' : ''}</div>
+                        <div class="lamina-details">
+                            <span class="detail-label">Tamaño:</span><span class="detail-value">${opcion.tamaño}</span>
+                            <span class="detail-label">Diseños/lámina:</span><span class="detail-value">${opcion.diseñosPorLamina}</span>
+                            <span class="detail-label">Láminas necesarias:</span><span class="detail-value">${opcion.laminasNecesarias}</span>
+                            <span class="detail-label">Coste total:</span><span class="detail-value">€${opcion.costeTotal.toFixed(2)}</span>
+                        </div>
+                        ${esRecomendada && ahorro > 0 ? `<div class="savings-note">Ahorro de €${ahorro.toFixed(2)} vs otra opción</div>` : ''}
+                    </div>`;
+            });
+            html += `</div><div class="result-section">
+                    <div class="result-title">Resumen Financiero</div>
+                    <div class="cost-breakdown"><span class="cost-label">Inversión total:</span><span class="cost-value">€${inversion.toFixed(2)}</span></div>
+                    <div class="cost-breakdown"><span class="cost-label">Ingresos (${cantidad} x €${precioVenta.toFixed(2)}):</span><span class="cost-value">€${ingresos.toFixed(2)}</span></div>
+                    <div class="cost-breakdown"><span class="cost-label" style="font-weight: 700;">Ganancia:</span><span class="cost-value" style="color: var(--color-secondary); font-weight: 700;">€${ganancia.toFixed(2)}</span></div>
+                    <div class="cost-breakdown"><span class="cost-label" style="font-weight: 700;">Rentabilidad:</span><span class="cost-value" style="color: var(--color-secondary); font-weight: 700;">${rentabilidad.toFixed(1)}%</span></div>
+                </div>`;
+            if (camisetas.unidadesSueltas > 0) {
+                const camisetasParaCerrar = CAMISETAS_POR_PACK - camisetas.unidadesSueltas;
+                const costeActualPorCamiseta = camisetas.costeTotal / cantidad;
+                const nuevaCantidad = cantidad + camisetasParaCerrar;
+                const nuevoCosteTotal = (camisetas.packsCompletos + 1) * CAMISETAS_POR_PACK * camisetas.precioPorCamiseta;
+                const nuevoCostePorCamiseta = nuevoCosteTotal / nuevaCantidad;
+                const ahorroPorCamiseta = costeActualPorCamiseta - nuevoCostePorCamiseta;
+                const ahorroTotal = ahorroPorCamiseta * cantidad;
+                if (ahorroPorCamiseta > 0) {
+                    html += `
+                        <div class="recommendation-box">
+                            <div class="recommendation-title">⚠ RECOMENDACIÓN DE OPTIMIZACIÓN</div>
+                            <p>Añade <strong>${camisetasParaCerrar} camiseta${camisetasParaCerrar > 1 ? 's' : ''} más</strong> para completar un pack y reducir el coste por unidad.</p>
+                            <div style="margin-top: 8px; font-size: 0.9rem; color: #666;">
+                                <strong>Coste actual:</strong> €${costeActualPorCamiseta.toFixed(2)}/camisa<br>
+                                <strong>Coste con pack completo:</strong> €${nuevoCostePorCamiseta.toFixed(2)}/camisa<br>
+                                <strong>Ahorro total en el pedido: €${ahorroTotal.toFixed(2)}</strong>
+                            </div>
+                        </div>`;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function guardarPresupuesto() {
+            if (!presupuestoActual) { alert('Primero debe calcular un presupuesto'); return; }
+            presupuestoActual.id = Date.now().toString();
+            sintraData.presupuestos.push(presupuestoActual);
+            saveData();
+            updateDashboardStats();
+            document.getElementById('guardarBtn').style.display = 'none';
+            alert('Presupuesto guardado exitosamente');
+        }
+
+        function agregarCliente() {
+            const iglesia = document.getElementById('clienteIglesia').value.trim();
+            const contacto = document.getElementById('clienteContacto').value.trim();
+            if (!iglesia) { alert('El campo "Iglesia" es obligatorio.'); return; }
+            if (!contacto) { alert('El campo "Contacto" es obligatorio.'); return; }
+
+            const fechaEvento = document.getElementById('clienteFechaEvento').value;
+            const tipoEvento = document.querySelector('input[name="tipoEvento"]:checked').value;
+            const estado = document.getElementById('clienteEstado').value;
+            const descripcion = document.getElementById('clienteDescripcion').value.trim();
+
+            const tallas = {
+                xs: parseInt(document.getElementById('tallaXS').value) || 0, s: parseInt(document.getElementById('tallaS').value) || 0,
+                m: parseInt(document.getElementById('tallaM').value) || 0, l: parseInt(document.getElementById('tallaL').value) || 0,
+                xl: parseInt(document.getElementById('tallaXL').value) || 0, '2xl': parseInt(document.getElementById('talla2XL').value) || 0,
+                '3xl': parseInt(document.getElementById('talla3XL').value) || 0, '4xl': parseInt(document.getElementById('talla4XL').value) || 0
+            };
+
+            const nuevoCliente = {
+                id: Date.now().toString(), iglesia, contacto,
+                denominacion: document.getElementById('clienteDenominacion').value.trim(), ciudad: document.getElementById('clienteCiudad').value.trim(),
+                cargo: document.getElementById('clienteCargo').value.trim(), telefono: document.getElementById('clienteTelefono').value.trim(),
+                email: document.getElementById('clienteEmail').value.trim(), direccion: document.getElementById('clienteDireccion').value.trim(),
+                tipoEvento, asistentes: parseInt(document.getElementById('clienteAsistentes').value) || 0, descripcion, fechaEvento,
+                cantidad: parseInt(document.getElementById('clienteCantidad').value) || 0, tallas, estado,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            sintraData.clientes.push(nuevoCliente);
+            saveData();
+            updateClientesList();
+            updateDatabaseInfo();
+            alert('Cliente agregado exitosamente');
+            if (fechaEvento) { addEventToCalendar(fechaEvento, `Evento: ${iglesia} - ${tipoEvento}`, estado, descripcion); }
+            document.getElementById('clienteIglesia').form.reset();
+        }
+
+        function addEventToCalendar(fecha, titulo, estado, descripcion = '') {
+            sintraData.eventos.push({ id: Date.now().toString(), fecha, titulo, estado, descripcion });
+            saveData();
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const mesActualElement = document.getElementById('mesActual');
+            const calendarioGrid = document.getElementById('calendarioGrid');
+            const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
+
+            if (monthSelect.options.length === 0) {
+                const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                meses.forEach((mes, index) => { monthSelect.innerHTML += `<option value="${index}">${mes}</option>`; });
+                const currentYear = new Date().getFullYear();
+                for (let i = currentYear - 5; i <= currentYear + 5; i++) { yearSelect.innerHTML += `<option value="${i}">${i}</option>`; }
+            }
+
+            monthSelect.value = fechaActual.getMonth();
+            yearSelect.value = fechaActual.getFullYear();
+            mesActualElement.textContent = fechaActual.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+
+            calendarioGrid.innerHTML = '';
+
+            const primerDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+            const ultimoDia = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+
+            let primerDiaSemana = primerDia.getDay();
+            if (primerDiaSemana === 0) primerDiaSemana = 7;
+
+            const totalDias = ultimoDia.getDate();
+
+            for (let i = primerDiaSemana - 2; i >= 0; i--) {
+                const fecha = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 0 - i);
+                calendarioGrid.innerHTML += `<div class="calendar-day other-month"><div class="day-number">${fecha.getDate()}</div></div>`;
+            }
+
+            const hoy = new Date();
+            for (let dia = 1; dia <= totalDias; dia++) {
+                const fecha = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), dia);
+                const eventosDia = sintraData.eventos.filter(e => new Date(e.fecha).toDateString() === fecha.toDateString());
+                const esHoy = fecha.toDateString() === hoy.toDateString();
+
+                let eventosHTML = '';
+                eventosDia.forEach(evento => {
+                    eventosHTML += `<div class="event-indicator event-${evento.estado}" title="${evento.titulo}" data-event-id="${evento.id}" data-event-titulo="${evento.titulo}" data-event-fecha="${new Date(evento.fecha).toLocaleDateString()}" data-event-descripcion="${evento.descripcion || ''}" data-event-estado="${evento.estado}" onclick="showEventDetails(this)">${evento.titulo.split(' - ')[0]}</div>`;
+                });
+
+                calendarioGrid.innerHTML += `<div class="calendar-day ${esHoy ? 'today' : ''}"><div class="day-number">${dia}</div>${eventosHTML}</div>`;
+            }
+
+            const celdasUsadas = (primerDiaSemana - 1) + totalDias;
+            const diasRestantes = Math.ceil(celdasUsadas / 7) * 7 - celdasUsadas;
+            for (let i = 1; i <= diasRestantes; i++) {
+                const fecha = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, i);
+                calendarioGrid.innerHTML += `<div class="calendar-day other-month"><div class="day-number">${fecha.getDate()}</div></div>`;
+            }
+        }
+
+        function showEventDetails(element) {
+            const modal = document.getElementById('eventModal');
+            const detailsDiv = document.getElementById('eventModalDetails');
+            const { eventId, eventTitulo, eventFecha, eventDescripcion, eventEstado } = element.dataset;
+            const estadoMap = { pc: 'Pendiente Contacto', ep: 'En Proceso', ea: 'Esperando Aprobación', cf: 'Confirmado', pr: 'En Producción', en: 'Entregado', ce: 'Cerrado' };
+            detailsDiv.innerHTML = `<p><strong>Título:</strong> ${eventTitulo}</p><p><strong>Fecha:</strong> ${eventFecha}</p><p><strong>Estado:</strong> ${estadoMap[eventEstado] || 'Desconocido'}</p>${eventDescripcion ? `<p><strong>Descripción:</strong> ${eventDescripcion}</p>` : ''}`;
+            modal.style.display = 'block';
+        }
+
+        function exportData() {
+            sintraData.configuracion.ultimaExportacion = new Date().toISOString();
+            saveData();
+            const dataStr = JSON.stringify(sintraData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `kadoshnissi_backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            updateDatabaseInfo();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    sintraData = JSON.parse(e.target.result);
+                    saveData();
+                    alert('Datos importados correctamente');
+                    updateDashboardStats(); updateDatabaseInfo(); updateClientesList(); renderCalendar(); updateContenidoGuardado();
+                    event.target.value = '';
+                } catch (error) { alert('Error al importar datos: Archivo inválido'); }
+            };
+            reader.readAsText(file);
+        }
+
+        function deleteAllData() {
+            if (confirm('¿Está seguro de que desea eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+                sintraData = { presupuestos: [], clientes: [], eventos: [], configuracion: { version: "1.0", ultimaExportacion: null } };
+                saveData();
+                alert('Todos los datos han sido eliminados');
+                updateDashboardStats(); updateDatabaseInfo(); updateClientesList(); renderCalendar(); updateContenidoGuardado();
+            }
+        }
+    </script>
+</body>
+</html>
